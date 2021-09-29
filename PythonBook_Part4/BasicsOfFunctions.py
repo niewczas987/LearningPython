@@ -8,5 +8,12 @@ print(times('xD', 10))  # argumenty mogą być dowolne, bo polimorfizm przy *
 
 
 def intersect(seq1, seq2):
-    pass
+    res=[]
+    for x in seq1:
+        if x in seq2:
+            res.append(x)
+    print(res)
 
+s1 = 'mielonka'
+s2 = 'biedronka'
+intersect(s1,s2)
