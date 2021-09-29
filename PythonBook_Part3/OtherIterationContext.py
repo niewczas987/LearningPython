@@ -35,3 +35,8 @@ def f(a,b,c,d):
 f(1,2,3,4)
 f(*[1,2,3,4])
 #f(*open('Expressions.py')) - daje błąd, bo za dużo argumentów - każda linia staje sie argumentem
+
+
+'''
+Przykladowy opis dokumentacji widoczny w help
+'''
