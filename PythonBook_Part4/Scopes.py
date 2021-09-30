@@ -113,10 +113,3 @@ def tester1(start):
         nested.state +=1
         nested.state = start
         return nested
-F = tester1(0)
-F('mielonka')
-F('szynka')
-F('jajka')
-G=tester1(42)
-G('jajka')
-F('bekon')
