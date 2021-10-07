@@ -27,3 +27,11 @@ print(module2.func)
 print(module2.klasa)
 print(list(module2.__dict__.keys()))
 print(dir(module2))
+
+
+#przeładowanie modułów
+import changer
+changer.printer()
+from importlib import reload
+reload(changer)
+changer.printer()
