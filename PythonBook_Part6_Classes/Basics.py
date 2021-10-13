@@ -37,3 +37,28 @@ class SecondClass(FirstClass):
 z=SecondClass()
 z.setdata(42)
 z.display()
+
+class ThirdClass(SecondClass):
+    def __init__(self,value):
+        self.data = value
+    def __add__(self, other):
+        return ThirdClass(self.data + other)
+    def __str__(self):
+        return '[ThirdClass:%s]'%self.data
+    def mul(self, other):
+        self.data *= other
+
+a= ThirdClass('abc')
+a.display() #Aktualna wartosc = "abc"
+print(a)    #[ThirdClass:abc]
+b=a+'xyz'
+print(b)    #[ThirdClass:abcxyz]
+a.mul(3)
+print(a)    #[ThirdClass:abcabcabc]
+
+class Person:
+    def __init__(self, name, job):
+        self.name = name
+        self.job = job
+    def info(self):
+        return (self.name, self.job)
