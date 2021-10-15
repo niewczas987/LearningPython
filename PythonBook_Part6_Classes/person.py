@@ -1,4 +1,9 @@
-class Person:
+from classtools import AttrDisplay
+
+class Person(AttrDisplay):
+    """
+    Tworzy i przetwarza rekordy osób
+    """
     def __init__(self,name,job=None,pay=0):
         self.name = name
         self.job = job
@@ -7,8 +12,28 @@ class Person:
         return self.name.split()[-1]
     def giveRaise(self,percent):
         self.pay = int(self.pay * (1+ percent))
-    def __str__(self):
-        return '[Person: %s,%s]'%(self.name, self.pay)
+
+class Manager(Person):
+    """
+    Dostosowana do własnych potrzeb klasa Person ze specjalnymi wymaganiami
+    """
+    def __init__(self,name,pay):
+        Person.__init__(self,name,'manager',pay)
+    def giveRaise(self,percent,bonus=.10):
+        Person.giveRaise(self,percent+bonus)
+
+class Department:
+    def __init__(self,*args):
+        self.members = list(args)
+    def addMember(self,person):
+        self.members.append(person)
+    def giveRaise(self,percent):
+        for person in self.members:
+            person.giveRaise(percent)
+    def showAll(self):
+        for person in self.members:
+            print(person)
+
 
 #testy
 if __name__ == '__main__':
@@ -22,3 +47,15 @@ if __name__ == '__main__':
     anna.giveRaise(.20)
     print(anna.pay)
     print(bob, anna)
+    tom = Manager('Tom Black',50000)
+    tom.giveRaise(.10)
+    print(tom)
+    print('Wszystkie osoby:')
+    for object in (bob,tom,anna):
+        object.giveRaise(.10)
+        print(object)
+
+    development = Department(bob, anna)
+    development.addMember(tom)
+    development.giveRaise(.10)
+    development.showAll()
