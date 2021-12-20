@@ -1,7 +1,7 @@
 '''
 Legend:
 # - maze wall
-o - start point
+o - route
 x - empty point, unvisited
 '''
 #imports
@@ -87,7 +87,7 @@ MAIN PROGRAM
 '''
 if __name__ == '__main__':
     # variables
-    cell = ' '
+    cell = '@'
     wall = '#'
     empty = 'X'
     height = 11
