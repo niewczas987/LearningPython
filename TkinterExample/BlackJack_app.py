@@ -17,7 +17,6 @@ class Card:
     def __repr__(self):
         return ''.join((self.suit, self.value))
     def get_file(self):
-        # self.cardImage = tk.PhotoImage(file=assets_folder+'\\'+''.join((self.suit,self.value))+'.png')
         #open image
         picture = Image.open(assets_folder+'\\'+''.join((self.suit,self.value))+'.png')
         #resize image
@@ -57,14 +56,6 @@ class Hand:
         self.value = 0
         has_ace = False
         for card in self.cards:
-            # if card.value.isnumeric():
-            #     self.value += int(card.value)
-            # else:
-            #     if int(card.value == 1):
-            #         has_ace = True
-            #         self.value += 11
-            #     elif self.value > 10:
-            #         self.value += 10
             if int(card.value)==1:
                 has_ace = True
                 self.value += 11
@@ -182,7 +173,7 @@ class GameScreen(tk.Tk):
     def display_table(self, hide_dealer=True, table_state=None):
         if not table_state:
             table_state = self.game_state.get_table_state()
-        player_card_images = [card.get_file() for card in table_state['player_cards']]
+        player_cards_images = [card.get_file() for card in table_state['player_cards']]
         dealer_cards_images = [card.get_file() for card in table_state['dealer_cards']]
         if hide_dealer and not table_state['blackjack']:
             dealer_cards_images[0] = Card.get_back_file()
@@ -193,7 +184,7 @@ class GameScreen(tk.Tk):
                                      text='Your cards',
                                      font=('Arial', 20,'bold'),
                                      fill='white')
-        for card_number, card_image in enumerate(player_card_images):
+        for card_number, card_image in enumerate(player_cards_images):
             self.game_screen.create_image((self.CARD_ORIGINAL_POSITION +
                                            self.CARD_WIDTH_OFFSET * card_number,
                                            self.PLAYER_CARD_HEIGHT),
