@@ -24,6 +24,52 @@ class GameWindow(tk.Tk):
         self.game_screen.pack(side=tk.LEFT, anchor=tk.N)
         self.game_screen.setup_opening_animation()
 
+    def hit(self):
+        self.game_screen.hit()
+
+    def show_gameplay_buttons(self):
+        self.next_round_button.pack_forget()
+        self.quit_button.pack_forget()
+        self.hit_button.pack(side=tk.LEFT, padx=(100,200))
+        self.stick_button.pack(side=tk.LEFT)
+
+    def remove_all_buttons(self):
+        self.next_round_button.pack_forget()
+        self.quit_button.pack_forget()
+        self.hit_button.pack_forget()
+        self.stick_button.pack_forget()
+        self.new_game_button.pack_forget()
+
+
+    def on_winner(self):
+        self.game_screen.update_text()
+        self.show_next_round_options()
+
+    def show_next_round_options(self):
+        self.hit_button.pack_forget()
+        self.stick_button.pack_forget()
+        self.next_round_button.pack(side=tk.LEFT, padx=(100, 200))
+        self.quit_button.pack(side=tk.LEFT)
+
+    def next_round(self):
+        self.remove_all_buttons()
+        self.game_screen.next_round()
+
+    def stick(self):
+        self.game_screen.stick()
+
+    def on_game_over(self):
+        self.hit_button.pack_forget()
+        self.stick_button.pack_forget()
+        self.new_game_button.pack(side=tk.LEFT, padx=(100, 200))
+        self.quit_button.pack(side=tk.LEFT)
+
+    def new_game(self):
+        self.remove_all_buttons()
+        self.game_screen.refresh()
+        self.game_screen.setup_opening_animation()
+
+
 class GameScreen(tk.Canvas):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
@@ -31,10 +77,10 @@ class GameScreen(tk.Canvas):
         self.DECK_COORDINATES = (700,100)
         self.CARD_ORIGINAL_POSITION = 100
         self.CARD_WIDTH_OFFSET = 100
-        self.PLAYER_CARD_HEIGHT = 350
-        self.DEALER_CARD_HEIGHT = 150
-        self.PLAYER_SCORE_TEXT_COORDS = (400, 450)
-        self.PLAYER_MONEY_COORDS = (500,100)
+        self.PLAYER_CARD_HEIGHT = 300
+        self.DEALER_CARD_HEIGHT = 100
+        self.PLAYER_SCORE_TEXT_COORDS = (340, 450)
+        self.PLAYER_MONEY_COORDS = (490,450)
         self.POT_MONEY_CORDS = (500,100)
         self.WINNER_TEXT_COORDS = (400, 250)
         #regular attributes
@@ -46,7 +92,7 @@ class GameScreen(tk.Canvas):
         self.player_money_text = None
         self.pot_money_text = None
         self.winner_text = None
-        self.card_to_deal_pointer = 0
+        self.cards_to_deal_pointer = 0
         self.frame = 0
 
     def setup_opening_animation(self):
@@ -57,12 +103,12 @@ class GameScreen(tk.Canvas):
         self.card_back_2 = self.create_image((self.DECK_COORDINATES[0]+20,
                                               self.DECK_COORDINATES[1]),
                                              image=self.card_back_image)
-        self.back1_movement = ([10] * 6 + [-10] * 6) * 7
-        self.back2_movement = ([10] * 6 + [-10] * 6) * 7
+        self.back_1_movement = ([10] * 6 + [-10] * 6) * 7
+        self.back_2_movement = ([10] * 6 + [-10] * 6) * 7
         self.play_card_animation()
 
     def play_card_animation(self):
-        if self.frame < len(self.back1_movement):
+        if self.frame < len(self.back_1_movement):
             self.move(self.card_back_1, self.back_1_movement[self.frame], 0)
             self.move(self.card_back_2, self.back_2_movement[self.frame], 0)
             self.update()
@@ -84,13 +130,13 @@ class GameScreen(tk.Canvas):
         self.cards_to_deal_positions = []
         for card_number, card_image in enumerate(player_cards_images):
             image_pos = self.get_player_card_pos(card_number)
-        self.cards_to_deal_images.append(card_image)
-        self.cards_to_deal_positions.append(image_pos)
+            self.cards_to_deal_images.append(card_image)
+            self.cards_to_deal_positions.append(image_pos)
         for card_number, card_image in enumerate(dealer_cards_images):
             image_pos = (self.CARD_ORIGINAL_POSITION + self.CARD_WIDTH_OFFSET *
                          card_number, self.DEALER_CARD_HEIGHT)
-        self.cards_to_deal_images.append(card_image)
-        self.cards_to_deal_positions.append(image_pos)
+            self.cards_to_deal_images.append(card_image)
+            self.cards_to_deal_positions.append(image_pos)
         self.play_deal_animation()
         while self.playing_animation:
             self.master.update()
@@ -105,15 +151,14 @@ class GameScreen(tk.Canvas):
     def update_text(self):
         self.delete(self.player_money_text, self.player_score_text, self.pot_money_text)
         self.player_score_text = self.create_text(self.PLAYER_SCORE_TEXT_COORDS,
-                                                  text=self.game_state.player_score_as_text(),
-                                                  fot=(None,20))
+                                                    text=self.game_state.player_score_as_text(),
+                                                    font=(None,20))
         self.player_money_text = self.create_text(self.PLAYER_MONEY_COORDS,
-                                                  text=self.game_state.player_money_as_text(),
-                                                  fot=(None, 20))
-
+                                                    text=self.game_state.player_money_as_text(),
+                                                    font=(None, 20))
         self.pot_money_text = self.create_text(self.POT_MONEY_CORDS,
-                                                  text=self.game_state.pot_money_as_text(),
-                                                  fot=(None, 20))
+                                                    text=self.game_state.pot_money_as_text(),
+                                                    font=(None, 20))
     def get_player_card_pos(self, card_number):
         return (self.CARD_ORIGINAL_POSITION + self.CARD_WIDTH_OFFSET *
                 card_number, self.PLAYER_CARD_HEIGHT)
@@ -158,32 +203,28 @@ class GameScreen(tk.Canvas):
                             image=self.cards_to_deal_images[self.cards_to_deal_pointer])
         self.update()
 
+    def hit(self):
+        self.master.remove_all_buttons()
+        new_card = self.game_state.draw()
+        card_number = len(self.game_state.player.hand.cards)
+        image_pos = self.get_player_card_pos(card_number)
+        self.cards_to_deal_images.append(new_card.get_file())
+        self.cards_to_deal_positions.append(image_pos)
+        self.play_deal_animation()
+        while self.playing_animation:
+            self.master.update()
+        self.game_state.hit(new_card)
+        self.update_text()
+        self.check_for_winner()
 
-
-class GameState:
-    def get_table_state(self):
-        blackjack = False
-        winner = self.has_winner
-        if not winner:
-            winner = self.someone_has_blackjack()
-            if winner:
-                blackjack = True
-        table_state = {
-            'player_cards': self.player_hand.cards,
-            'dealer_cards': self.dealer_hand.cards,
-            'has_winner': winner,
-            'blackjack': blackjack
-        }
-        return table_state
-
-    def player_score_as_text(self):
-        return "Score: " + str(self.player.score)
-
-    def player_money_as_text(self):
-        return "Money: $" + str(self.player.money)
-
-    def player_score_as_text(self):
-        return "Pot: $" + str(self.pot)
+    def check_for_winner(self):
+        winner = self.game_state.check_for_winner()
+        if winner:
+            self.show_dealers_hand(self.game_state.get_table_state())
+            self.show_winner_text(winner)
+            self.master.on_winner()
+        else:
+            self.master.show_gameplay_buttons()
 
     def show_winner_text(self,winner):
         if winner == 'p':
@@ -202,10 +243,147 @@ class GameState:
     def show_out_of_money_text(self):
         self.winner_text = self.create_text(self.WINNER_TEXT_COORDS,
                                             text="Out Of Money - Game Over",
-                                            font=(None, 50))
+                                            font=(None, 30))
+
+    def show_dealers_hand(self, table_state):
+        dealer_first_card = table_state['dealer_cards'][0].get_file()
+        self.create_image((self.CARD_ORIGINAL_POSITION,
+                           self.DEALER_CARD_HEIGHT),
+                          image=dealer_first_card)
+
+    def next_round(self):
+        self.delete(self.winner_text)
+        self.winner_text = None
+        self.game_state.assign_winnings()
+        if self.game_state.player.can_place_bet(self.game_state.player.money):
+            self.game_state.next_round()
+            self.display_table()
+        else:
+            self.show_out_of_money_text()
+            self.master.on_game_over()
+
+    def stick(self):
+        table_state = self.game_state.calculate_final_state()
+        self.show_dealers_hand(table_state)
+        self.show_winner_text(table_state['has_winner'])
+        self.master.on_winner()
+
+    def on_game_over(self):
+        self.game_window.on_game_over()
+
+    def refresh(self):
+        self.game_state = GameState()
 
 
-        '''
-        TODO:
-        strona 90
-        '''
+class GameState:
+    def __init__(self):
+        self.BASE_BET = 5
+        self.minimum_bet = self.BASE_BET
+        self.current_round = 1
+        self.pot = 0
+        self.deck = Deck()
+        self.deck.shuffle()
+        self.player = Player()
+        self.dealer = Dealer()
+        self.begin_round()
+
+    def begin_round(self):
+        self.has_winner = ''
+        for i in range(2):
+            self.player.receive_card(self.deck.deal())
+            self.dealer.receive_card(self.deck.deal())
+        self.player.place_bet(self.minimum_bet)
+        self.add_bet(self.minimum_bet*2)
+
+    def add_bet(self,amount):
+        self.pot += amount
+
+    def get_table_state(self):
+        blackjack = False
+        winner = self.has_winner
+        if not winner:
+            winner = self.someone_has_blackjack()
+            if winner:
+                blackjack = True
+        table_state = {
+            'player_cards': self.player.hand.cards,
+            'dealer_cards': self.dealer.hand.cards,
+            'has_winner': winner,
+            'blackjack': blackjack
+        }
+        return table_state
+
+    def player_score_as_text(self):
+        return "Score: " + str(self.player.score)
+
+    def player_money_as_text(self):
+        return "Money: $" + str(self.player.money)
+
+    def pot_money_as_text(self):
+        return "Pot: $" + str(self.pot)
+
+
+    def hit(self, card):
+        self.player.receive_card(card)
+
+    def check_for_winner(self):
+        if self.player.has_blackjack:
+            self.has_winner = 'p'
+        elif self.player.is_over:
+            self.has_winner ='d'
+        return self.has_winner
+
+    def assign_winnings(self):
+        winner = self.has_winner
+        if winner == 'p':
+            self.player.add_winnings(self.pot)
+            self.pot = 0
+        elif winner == 'd':
+            self.pot = 0
+
+    def next_round(self):
+        self.current_round += 1
+        self.minimum_bet = self.BASE_BET * self.current_round
+        self.player.empty_hand()
+        self.dealer.empty_hand()
+        self.begin_round()
+
+    def calculate_final_state(self):
+        player_hand_value = self.player.score
+        dealer_hand_value = self.dealer.score
+        if player_hand_value == dealer_hand_value:
+            winner = 'dp'
+        elif player_hand_value > dealer_hand_value:
+            winner = 'p'
+        else:
+            winner = 'd'
+        self.has_winner = winner
+        table_state = {
+            'player_cards': self.player.cards,
+            'dealer_cards': self.dealer.cards,
+            'has_winner': winner,
+        }
+        return table_state
+
+    def someone_has_blackjack(self):
+        player = False
+        dealer = False
+        if self.player.hand.get_value() == 21:
+            player = True
+        if self.dealer.hand.get_value() == 21:
+            dealer = True
+        if player and dealer:
+            return 'dp'
+        elif player:
+            return 'p'
+        elif dealer:
+            return 'd'
+        return False
+
+    def draw(self):
+        return self.deck.deal()
+
+
+if __name__ == '__main__':
+    gw = GameWindow()
+    gw.mainloop()

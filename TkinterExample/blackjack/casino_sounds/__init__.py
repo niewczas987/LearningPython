@@ -7,7 +7,7 @@ class SoundBoard:
         pygame.init()
         self.sound_folder = os.path.join(assets_folder,'sounds')
         self.place_sound = self.load_sound('cardPlace1.wav')
-        self.Shuffle_sound = self.load_sound('cardShuffle.wav')
+        self.shuffle_sound = self.load_sound('cardShuffle.wav')
         self.chip_sound = self.load_sound('chipsStack6.wav')
     def load_sound(self,sound):
         file_location = os.path.join(self.sound_folder,sound)

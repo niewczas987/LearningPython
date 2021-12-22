@@ -1,6 +1,6 @@
-from __init__ import assets_folder
 from PIL import ImageTk, Image
-
+import os
+assets_folder = os.path.abspath(r'C:\Users\PLKANIE3\PycharmProjects\LearningPython\TkinterExample\assets')
 
 class Card:
     def __init__(self, suit, value):

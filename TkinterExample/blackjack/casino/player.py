@@ -5,7 +5,7 @@ class Player:
         self.money = 50
         self.hand = Hand()
     def add_winnings(self,winnings):
-        self.money = winnings
+        self.money += winnings
     def can_place_bet(self,amount):
         return self.money >= amount
     def place_bet(self, amount):
