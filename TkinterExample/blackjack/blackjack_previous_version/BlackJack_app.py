@@ -8,7 +8,7 @@ import os
 import random
 import tkinter as tk
 from PIL import ImageTk, Image
-assets_folder = os.path.abspath(r'C:\Users\PLKANIE3\PycharmProjects\LearningPython\TkinterExample\assets')
+assets_folder = os.path.abspath(r'/TkinterExample/assets')
 
 class Card:
     def __init__(self, suit, value):
