@@ -89,6 +89,13 @@ class Highlighter:
         self.text_widget.tag_configure('number', foreground=self.numbers_color)
         self.text_widget.tag_configure('string', foreground=self.strings_color)
 
+    def force_highlight(self):
+        self.highlight()
+
+    def clear_highlight(self):
+        for category in self.categories:
+            self.text_widget.tag_remove(category, 1.0, tk.END)
+
 if __name__=='__main__':
     w = tk.Tk()
     t = tk.Text(w, bg='white', fg='black')
