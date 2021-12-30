@@ -42,8 +42,10 @@ class FontChooser(tk.Toplevel):
         with open('schemes/font.yaml','w') as file:
             file.write(yaml_file_contents)
         self.master.update_font()
+        self.destroy()
 
 if __name__=='__main__':
-    mw = tk.Tk()
+    from TextEditor import MainWindow
+    mw = MainWindow()
     fw = FontChooser(mw)
     mw.mainloop()

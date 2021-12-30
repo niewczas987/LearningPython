@@ -9,7 +9,7 @@ from LineNumbers import LineNumbers
 from FindWindow import FindWindow
 from tkinter import filedialog
 from FontChooser import FontChooser
-
+#todo: add visibility of color chooser
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -20,15 +20,18 @@ class MainWindow(tk.Tk):
         self.highlighter = Highlighter(self.text_area, 'languages/python.yaml')
         self.menu = tk.Menu(self, bg='lightgrey', fg='black')
         sub_menu_items = ['file', 'edit', 'tools', 'help']
-        self.generate_sub_menu_items(sub_menu_items)
-        self.configure(menu=self.menu)
         self.right_click_menu = tk.Menu(self, bg="lightgrey", fg="black", tearoff=0)
         self.right_click_menu.add_command(label='Cut', command=self.edit_cut)
         self.right_click_menu.add_command(label='Copy', command=self.edit_copy)
         self.right_click_menu.add_command(label='Paste', command=self.edit_paste)
+        self.all_menus = [self.menu, self.right_click_menu]
+        self.generate_sub_menu_items(sub_menu_items)
+        self.configure(menu=self.menu)
         self.open_file = None
         self.font_family = 'Arial'
         self.font_size = 10
+        self.background = 'lightgrey'
+        self.foreground = 'black'
         self.line_number = LineNumbers(self, self.text_area, bg='grey', fg='white', width=1)
         self.bind_events()
         #packing
@@ -53,6 +56,7 @@ class MainWindow(tk.Tk):
                 friendly_name = ' '.join(match.split('_')[1:])
                 sub_menu.add_command(label=friendly_name.title(), command=actual_method, accelerator=method_shortcut)
             self.menu.add_cascade(label=item.title(), menu=sub_menu)
+            self.all_menus.append(sub_menu)
 
     def show_right_click_menu(self, event):
         x = self.winfo_x() + event.x
@@ -86,7 +90,7 @@ class MainWindow(tk.Tk):
         self.text_area.bind('<Control-f>', self.show_find_window)
         self.text_area.bind('<Button-3>', self.show_right_click_menu)
         self.text_area.bind('<Control-m>', self.tools_change_syntax_highlighting)
-        self.text_area.bind('<Control-L>', self.tools_change_font)
+        self.text_area.bind('<Control-l>', self.tools_change_font)
 
     def show_find_window(self, event=None):
         FindWindow(self.text_area)
@@ -170,6 +174,19 @@ class MainWindow(tk.Tk):
     def tools_change_font(self, event=None):
         '''Ctrl+L'''
         self.change_font()
+
+    def apply_color_scheme(self, foreground, background, text_foreground, text_background):
+        self.background = background
+        self.foreground = foreground
+        self.text_area.configure(fg=text_foreground, bg=text_background)
+        for menu in self.all_menus:
+            menu.configure(bg=self.background, fg=self.foreground)
+        self.configure_ttk_elements()
+
+    def configure_ttk_elements(self):
+        style = ttk.Style()
+        style.configure('editor.TLabel', foreground=self.foreground, background=self.background)
+        style.configure('editor.TButton', foreground=self.foreground,background=self.background)
 
 if __name__=='__main__':
     mw = MainWindow()
