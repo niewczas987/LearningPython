@@ -13,6 +13,7 @@ class FontChooser(tk.Toplevel):
         self.title('Choose font and size')
         self.columnconfigure(0, weight=3)
         self.columnconfigure(1, weight=2)
+        self.configure(bg=self.master.background)
         #configuring widgets
         self.font_list = tk.Listbox(self, exportselection=False)
         self.available_fonts = sorted(families())

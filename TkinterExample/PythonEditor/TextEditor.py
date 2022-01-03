@@ -1,19 +1,24 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-
+import tkinter.messagebox as msg
 import yaml
-
 from TextArea import TextArea
 from Highlighter import Highlighter
 from LineNumbers import LineNumbers
 from FindWindow import FindWindow
 from tkinter import filedialog
 from FontChooser import FontChooser
-#todo: add visibility of color chooser
+from ColorChooser import ColorChooser
+
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('Text Editor')
+        self.background = 'lightgrey'
+        self.foreground = 'black'
+        self.text_background = 'lightgrey'
+        self.text_foreground = 'black'
+        self.configure_ttk_elements()
         self.text_area = TextArea(self, bg='white', fg='black', undo=True)
         self.scrollbar = ttk.Scrollbar(orient='vertical', command=self.scroll_text)
         self.text_area.configure(yscrollcommand=self.scrollbar.set)
@@ -30,8 +35,6 @@ class MainWindow(tk.Tk):
         self.open_file = None
         self.font_family = 'Arial'
         self.font_size = 10
-        self.background = 'lightgrey'
-        self.foreground = 'black'
         self.line_number = LineNumbers(self, self.text_area, bg='grey', fg='white', width=1)
         self.bind_events()
         #packing
@@ -45,7 +48,7 @@ class MainWindow(tk.Tk):
         my_methods = [method for method in set(window_methods)-set(tkinter_methods)] #list of all available created methods
         my_methods = sorted(my_methods)
         for item in sub_menu_items:
-            sub_menu = tk.Menu(self.menu, tearoff=0, bg='lightgrey', fg='black')
+            sub_menu = tk.Menu(self.menu, tearoff=0, bg=self.background, fg=self.foreground)
             matching_methods = []
             for method in my_methods:
                 if method.startswith(item):
@@ -91,6 +94,8 @@ class MainWindow(tk.Tk):
         self.text_area.bind('<Button-3>', self.show_right_click_menu)
         self.text_area.bind('<Control-m>', self.tools_change_syntax_highlighting)
         self.text_area.bind('<Control-l>', self.tools_change_font)
+        self.text_area.bind('<Control-g>', self.tools_change_color_scheme)
+        self.text_area.bind('<Control-h>', self.help_about)
 
     def show_find_window(self, event=None):
         FindWindow(self.text_area)
@@ -186,7 +191,25 @@ class MainWindow(tk.Tk):
     def configure_ttk_elements(self):
         style = ttk.Style()
         style.configure('editor.TLabel', foreground=self.foreground, background=self.background)
-        style.configure('editor.TButton', foreground=self.foreground,background=self.background)
+        style.configure('editor.TButton', foreground=self.foreground, background=self.background, relief='flat')
+        '''
+        Ttk button styles have only few predefined styles that's why background stays the same.
+        '''
+
+    def change_color_scheme(self):
+        ColorChooser(self)
+
+    def tools_change_color_scheme(self, event=None):
+        '''Ctrl+G'''
+        self.change_color_scheme()
+
+    def show_about_page(self):
+        msg.showinfo("About", "My text editor, written in Python3.9 using tkinter! Created by KN with the book"
+                              " 'Tkinter GUI Programming by Example'")
+
+    def help_about(self, event=None):
+        '''Ctrl+H'''
+        self.show_about_page()
 
 if __name__=='__main__':
     mw = MainWindow()
