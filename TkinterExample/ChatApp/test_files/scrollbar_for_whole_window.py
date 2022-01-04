@@ -1,17 +1,28 @@
 import tkinter as tk
+from tkinter import ttk
 
-win = tk.Tk()
-canvas = tk.Canvas(win)
-frame = tk.Frame(canvas)
+root = tk.Tk()
+container = ttk.Frame(root)
+canvas = tk.Canvas(container)
+scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+scrollable_frame = ttk.Frame(canvas)
 
-scroll = tk.Scrollbar(win, orient='vertical', command=canvas.yview)
-scroll.pack(side=tk.RIGHT, fill=tk.Y)
+scrollable_frame.bind(
+    "<Configure>",
+    lambda e: canvas.configure(
+        scrollregion=canvas.bbox("all")
+    )
+)
 
-canvas.configure(yscrollcommand=scroll.set)
-canvas.pack(fill=tk.BOTH, expand=1)
-canvas.create_window((0,0), window=frame, anchor='nw')
+canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
 
-for _ in range(30):
-    tk.Label(win, text='big label').pack(pady=20)
+canvas.configure(yscrollcommand=scrollbar.set)
 
-win.mainloop()
+for i in range(50):
+    ttk.Label(scrollable_frame, text="Sample scrolling label").pack()
+
+container.pack()
+canvas.pack(side="left", fill="both", expand=True)
+scrollbar.pack(side="right", fill="y")
+
+root.mainloop()
