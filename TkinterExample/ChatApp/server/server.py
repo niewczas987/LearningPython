@@ -18,19 +18,19 @@ def index():
     }
     return jsonify(data)
 
-@app.route('/send_me_data', methods=['POST'])
+@app.route('/sendMeData', methods=['POST'])
 def send_me_data():
     data = request.form
     for key, value in data.items():
         print('received', key, ' with value', value)
     return 'Thanks'
 
-@app.route("/get_all_users")
+@app.route("/getAllUsers")
 def get_all_users():
     all_users = database.get_all_users()
     return jsonify(all_users)
 
-@app.route("/add_user")
+@app.route("/addUser")
 def add_user():
     data = request.form
     username = data["username"]
@@ -38,13 +38,16 @@ def add_user():
     database.add_user(username, real_name)
     return jsonify("User Created")
 
-@app.route("/user_exists", methods=["POST"])
+@app.route("/userExists", methods=["POST"])
 def user_exists():
     username = request.form.get("username")
     exists = database.user_exists(username)
-    return jsonify({"exists": exists})
+    if exists:
+        return jsonify({"exists": True})
+    else:
+        return jsonify({"exists": False})
 
-@app.route("/create_conversation_db", methods=["POST"])
+@app.route("/createConversationDb", methods=["POST"])
 def create_conversation_db():
     conversation_db_path = get_conversation_db_path_for_users(request.form)
     if not os.path.exists(conversation_db_path):
@@ -52,14 +55,14 @@ def create_conversation_db():
         conversation.initialise_table()
     return jsonify({"success": True,})
 
-@app.route("/get_message_history", methods=["POST"])
+@app.route("/getMessageHistory", methods=["POST"])
 def get_message_history():
     conversation_db_path = get_conversation_db_path_for_users(request.form)
     conversation = Conversation(conversation_db_path)
     history = conversation.get_history()
     return jsonify({"history": history})
 
-@app.route("/send_message/<username>", methods=["POST"])
+@app.route("/sendMessage/<username>", methods=["POST"])
 def send_message(username):
     data = request.form
     author = data["author"]

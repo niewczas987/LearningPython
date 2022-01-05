@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 from emojiSelect import EmojiSelect
 
 class ChatWindow(tk.Toplevel):
-    def __init__(self, master, friend_name, friend_avatar, **kwargs):
+    def __init__(self, master, friend_name, friend_username, friend_avatar, **kwargs):
         super().__init__(master, **kwargs)
         self.master = master
         #configure window
@@ -44,9 +44,11 @@ class ChatWindow(tk.Toplevel):
         self.emoji_button.pack(side=tk.LEFT, pady=5)
         self.text_area.pack(side=tk.LEFT, fill=tk.X, expand=1, pady=5)
         self.send_button.pack(side=tk.RIGHT, pady=5)
-        #trigger functions
+        #trigger functions & variables
+        self.friend_username = friend_username
         self.configure_styles()
         self.bind_events()
+        self.load_history()
 
     def configure_styles(self):
         style = ttk.Style()
@@ -56,9 +58,15 @@ class ChatWindow(tk.Toplevel):
         self.bind('<Return>', self.send_message)
         self.text_area.bind('<Return>', self.send_message)
 
+    def load_history(self):
+        history = self.master.requester.prepare_conversation(self.master.username, self.friend_username)
+        if len(history['history']):
+            for message in history['histoyr']:
+                self.receive_message(message['author'], message['message'])
     def send_message(self):
         message = self.text_area.get(1.0, tk.END)
         if message.strip() or len(self.text_area.emojis):
+            self.master.requester.send_message(self.master.username, self.friend_username, message,)
             message = 'Me:' + message
             self.message_area.configure(state='normal')
             self.message_area.insert(tk.END, message)
@@ -78,6 +86,14 @@ class ChatWindow(tk.Toplevel):
             self.message_area.configure(state='disabled')
             self.text_area.delete(1.0, tk.END)
         return 'break'
+
+    def receive_message(self, author, message):
+        self.message_area.configure(state='normal')
+        if author == self.master.username:
+            author = 'Me'
+        message_with_author = author + ': ' + message
+        self.message_area.insert(tk.END, message_with_author)
+        self.message_area.configure(state='disabled')
 
     def add_emoji(self, emoji):
         emoji_index = self.text_area.index(self.text_area.image_create(tk.END, image=emoji))

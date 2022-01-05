@@ -21,3 +21,11 @@ def init_maze(width, height):
     return maze
 
 print(init_maze(10,10))
+
+
+diction = {'a':1,
+            'b':1,
+            'c':1
+            }
+print(diction)
+print(diction['a'])
