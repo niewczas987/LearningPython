@@ -31,7 +31,7 @@ class Requester:
         params = {'username': username}
         user_exists = self.request('POST', endpoint, params)
         print('user_exists',user_exists)
-        if user_exists['exists']:
+        if user_exists['exists'] == 'false':
             return False
         endpoint = '/addUser'
         params['real_name'] = real_name
