@@ -6,43 +6,14 @@ from tkinter import scrolledtext
 from tkinter import Menu
 from tkinter import messagebox as msg
 from tkinter import Spinbox
+import Python_GUI_Cookbook.Ch04_oop.GUI_Tooltip as tt
+from threading import Thread
+
 
 #GLOBALS
+GLOBAL_CONST=42
 #radiobutton globals
 colors = ['blue','red','gold']
-
-#tooltip
-class ToolTip(object):
-    def __init__(self, widget):
-        self.widget = widget
-        self.tip_window = None
-
-    def show_tip(self,tip_text):
-        if self.tip_window or not tip_text:
-            return
-        x, y, _cx, cy = self.widget.bbox('insert') #get a size of widget
-        x = x + self.widget.winfo_rootx() + 25 #configure where to display tooltip window
-        y = y + cy + self.widget.winfo_rooty() + 25
-        self.tip_window = tw = tk.Toplevel(self.widget) #create new tooltip window
-        tw.wm_overrideredirect(True)    #remove window decoration
-        tw.wm_geometry('+%d+%d' % (x,y))
-        label = tk.Label(tw, text=tip_text, justify=tk.LEFT, background='#ffffe0', relief=tk.SOLID, borderwidth=1, font=('tahoma','8','normal'))
-        label.pack(ipadx=1)
-
-    def hide_tip(self):
-        tw = self.tip_window
-        self.tip_window = None
-        if tw:
-            tw.destroy()
-
-def create_ToolTip(widget,text):
-    toolTip = ToolTip(widget)
-    def enter(event):
-        toolTip.show_tip(text)
-    def leave(event):
-        toolTip.hide_tip()
-    widget.bind('<Enter>', enter)
-    widget.bind('<Leave>', leave)
 
 
 class OOP():
@@ -51,6 +22,9 @@ class OOP():
         self.win = tk.Tk()
         self.win.title("Python GUI")
         self.create_widgets()
+
+    def method_in_a_thread(self):
+        print('Hi!')
 
     #callback methods
     def click(self):
@@ -82,9 +56,9 @@ class OOP():
         self.win.after(wait_ms, self.progress_bar.stop())
 
     def _spin(self):
-        self.value = self.spin.get()
-        print(self.value)
-        self.scr.insert(tk.INSERT, self.value + '\n')
+        value = self.spin.get()
+        #print(value)
+        self.scr.insert(tk.INSERT, value + '\n')
 
     #methods for menu
     def _quit(self):
@@ -98,7 +72,7 @@ class OOP():
         # msg.showwarning('Python message warning box', 'Created using Tkinter.\n2022')
         # msg.showerror('Python message error box', 'Created using Tkinter.\n2022')
         self.answer = self.msg.askyesnocancel('Multiple choice box','DO you want to do this?')
-        print(self.answer)
+        #print(self.answer)
 
 
     def create_widgets(self):
@@ -125,8 +99,8 @@ class OOP():
 
         #adding a text to text box entry widget
         self.name = tk.StringVar()
-        self.name_entered = ttk.Entry(self.mighty, width=10, textvariable=self.name)
-        self.name_entered.grid(column=0, row=1)
+        self.name_entered = ttk.Entry(self.mighty, width=24, textvariable=self.name)
+        self.name_entered.grid(column=0, row=1, sticky='W')
 
         #add button
         self.action = ttk.Button(self.mighty,text='Click me!', command=self.click)
@@ -136,7 +110,7 @@ class OOP():
         #adding combobox
         ttk.Label(self.mighty,text='Choose a number:').grid(column=0,row=2)
         self.number = tk.StringVar()
-        self.number_chosen = ttk.Combobox(self.mighty, width=10, textvariable=self.number, state='readonly')
+        self.number_chosen = ttk.Combobox(self.mighty, width=14, textvariable=self.number, state='readonly')
         self.number_chosen['values'] = (1,2,4,6,8)
         self.number_chosen.grid(column=1, row=2)
         self.number_chosen.current(0)
@@ -167,9 +141,9 @@ class OOP():
             self.curRad.grid(column=col, row=4, sticky=tk.W)
 
         #scrollbar widget
-        self.scroll_w = 30
-        self.scroll_h = 5
-        self.scr = scrolledtext.ScrolledText(self.mighty, width=self.scroll_w, height=self.scroll_h, wrap=tk.WORD)
+        scroll_w = 40
+        scroll_h = 10
+        self.scr = scrolledtext.ScrolledText(self.mighty, width=scroll_w, height=scroll_h, wrap=tk.WORD)
         self.scr.grid(column=0, row=5, sticky='WE', columnspan=3)
 
         #add progressbar
@@ -189,10 +163,10 @@ class OOP():
 
         #adding spinbox widget
         self.spin = Spinbox(self.mighty, from_=0, to=10, width=5, bd=5, command=self._spin)
-        self.spin.grid(column=0, row=3)
+        self.spin.grid(column=0, row=3, sticky='W')
         #second spinbox in different style
         self.spin = Spinbox(self.mighty, values=(1,2,4,10), width=5, bd=10, command=self._spin, relief=tk.GROOVE)
-        self.spin.grid(column=1, row=3)
+        self.spin.grid(column=1, row=3, sticky='W')
 
 
 
@@ -234,11 +208,15 @@ class OOP():
         self.name_entered.focus()
 
         #add a tooltip
-        create_ToolTip(self.spin,'This is a sSpin control')
-        create_ToolTip(self.scr, 'This is a scroll')
+        tt.create_ToolTip(self.spin,'This is a Spin control')
+        tt.create_ToolTip(self.scr, 'This is a scroll')
 
 
 
 #START GUI
 oop = OOP()
+
+#running methods in a thread
+run_thread = Thread(target=oop.method_in_a_thread)
+
 oop.win.mainloop()
