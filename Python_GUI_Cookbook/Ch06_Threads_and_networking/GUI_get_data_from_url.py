@@ -14,7 +14,7 @@ import Python_GUI_Cookbook.Ch06_Threads_and_networking.Queues as bq
 from tkinter import filedialog as fd
 from os import path, makedirs
 import Python_GUI_Cookbook.Ch06_Threads_and_networking.TCP_Server as tcp
-
+import Python_GUI_Cookbook.Ch06_Threads_and_networking.URL as url
 
 #GLOBALS
 GLOBAL_CONST=42
@@ -84,6 +84,10 @@ class OOP():
         self.a_label.configure(foreground='red')
         self.a_label.configure(text='A red label')
         bq.write_to_scrol(self)
+        sleep(2)
+        html_data = url.get_html()
+        print(html_data)
+        self.scr.insert(tk.INSERT,html_data)
 
 
 
