@@ -36,6 +36,7 @@ class SQLite():
             os.remove(dbName)
         else:
             print("The file does not exist")
+
     def createTable(self, tableName):
         conn, cursor = self.connect()
         try:
@@ -67,19 +68,27 @@ class SQLite():
                         ORDER BY name;''')
         print(cursor.fetchall())
         self.close(conn,cursor)
+
     def insertBooks(self, title, page, bookQuote):
         conn, cursor = self.connect()
         if title:
-            cursor.execute('INSERT INTO Books(\'Book_Title\', \'Book_Page\') VALUES (\'%s\', \'%s\');'% (title, page))
-            conn.commit()
+            try:
+                cursor.execute('INSERT INTO Books(\'Book_Title\', \'Book_Page\') VALUES (\'%s\', \'%s\');'% (title, page))
+                conn.commit()
+            except Exception as ex:
+                print('Exception trying to insert book. \nEx: ' + str(ex))
         if bookQuote:
-            cursor.execute('SELECT Book_ID From Books WHERE Book_Title = \'%s\';'%(title))
-            book_containing = cursor.fetchall()[0][0]
-            cursor.execute('INSERT INTO Quotations(\'Quotation\', \'Books_Book_Id\') VALUES (\'%s\', \'%s\');' % (bookQuote, book_containing))
-            conn.commit()
+            try:
+                cursor.execute('SELECT Book_ID From Books WHERE Book_Title = \'%s\';'%(title))
+                book_containing = cursor.fetchall()[0][0]
+                cursor.execute('INSERT INTO Quotations(\'Quotation\', \'Books_Book_Id\') VALUES (\'%s\', \'%s\');' % (bookQuote, book_containing))
+                conn.commit()
+            except Exception as ex:
+                print('Exception trying to insert quote. \nEx: '+ str(ex))
         print(cursor.fetchall())
         self.showBooks()
         self.close(conn, cursor)
+
     def insertBooksExample(self):
         conn, cursor = self.connect()
         cursor.execute('INSERT INTO Books(\'Book_Title\', \'Book_Page\') VALUES (\'test1\', \'2137\');')
@@ -90,15 +99,28 @@ class SQLite():
     def showBooks(self):
         conn, cursor = self.connect()
         cursor.execute('''SELECT * FROM Books;''')
-        print(cursor.fetchall())
+        all_books = cursor.fetchall()
+        print(all_books)
         self.close(conn, cursor)
+        return all_books
+
+    def showQuotes(self):
+        conn, cursor = self.connect()
+        cursor.execute('''SELECT q.Quotation, b.Book_Title FROM Quotations q 
+                        INNER JOIN Books b ON q.Books_book_ID=b.Book_ID ;''')
+        all_quotes = cursor.fetchall()
+        print(all_quotes)
+        self.close(conn, cursor)
+        return all_quotes
 
     def showColumns(self,tableName):
         # connect to sqlite
         conn, cursor = self.connect()
         cursor.execute('PRAGMA table_info(%s);'%(tableName))
-        print(cursor.fetchall())
+        all_books = cursor.fetchall()
+        print(all_books)
         self.close(conn, cursor)
+
 
     def showData(self):
         # connect to sqlite
@@ -116,21 +138,21 @@ if __name__ == '__main__':
     #sqlite.showData()
     #sqlite.createGuiDB('dupa.db')
     #sqlite.dropGuiDB('dupa.db')
-    sqlite.createTable('qqq')
-    sqlite.showDBs()
-    sqlite.alterTable('qqq','xD')
-    print('TABLES:')
-    sqlite.showTables()
-    print('BOOKS:')
-    sqlite.showBooks()
-    sqlite.dropTable('qqq')
-    print('TABLES:')
-    sqlite.showTables()
-    print('COLUMNS')
-    sqlite.showColumns('Books')
-    print('INSERT BOOKS EXEMPLARY')
-    sqlite.insertBooksExample()
-    print('INSERT DEFINED BOOK')
-    sqlite.insertBooks('dupa','123','dupadupadupa')
-
+    # sqlite.createTable('qqq')
+    # sqlite.showDBs()
+    # sqlite.alterTable('qqq','xD')
+    # print('TABLES:')
+    # sqlite.showTables()
+    # print('BOOKS:')
+    # sqlite.showBooks()
+    # sqlite.dropTable('qqq')
+    # print('TABLES:')
+    # sqlite.showTables()
+    # print('COLUMNS')
+    # sqlite.showColumns('Books')
+    # print('INSERT BOOKS EXEMPLARY')
+    # sqlite.insertBooksExample()
+    # print('INSERT DEFINED BOOK')
+    # sqlite.insertBooks('dupa','123','dupadupadupa')
+    sqlite.showQuotes()
 
