@@ -10,6 +10,6 @@ class RequestHandler(BaseRequestHandler):
             self.request.send(b'Server received: '+rsp)
 
 def start_server():
-    print('Server started')
+    # print('Server started')
     server = TCPServer(('',24000),RequestHandler)
     server.serve_forever()

@@ -47,3 +47,13 @@ class I18N():
         self.copyFileTo = 'Kopiere Datei zu : '
         self.timeZones = "Alle Zeitzonen"
         self.localZone = "Lokale Zone"
+
+#adding self testing
+if __name__ == '__main__':
+    language = 'de'
+    inst = I18N(language)
+    print(inst.title)
+
+    language = 'en'
+    inst = I18N(language)
+    print(inst.title)

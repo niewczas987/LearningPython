@@ -8,5 +8,5 @@ def write_to_scrol(inst):
     for idx in range(3):
         sock.send(b'Message from queue: ' + bytes(str(idx).encode()))
         recv = sock.recv(8192).decode()
-        inst.gui_queue.put(recv)
+        inst.oop.gui_queue.put(recv)
     inst.create_thread(6)
